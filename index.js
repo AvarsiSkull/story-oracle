@@ -2703,7 +2703,7 @@ function renderConnPresets() {
     if (!sel) return;
     const cur = sel.value;
     const list = getSettings().connPresets || [];
-    sel.innerHTML = '<option value="">（选择存档加载）</option>';
+    sel.innerHTML = '<option value="">(Chọn bản lưu để tải)</option>';
     for (const p of list) { const opt = document.createElement('option'); opt.value = p.name; opt.textContent = p.name; sel.appendChild(opt); }
     if (list.some((p) => p.name === cur)) sel.value = cur;
 }
@@ -4881,7 +4881,7 @@ function lbResolveSelectPlan(selects, books, currentSel) {
             if (spec.all) {
                 if (action === 'select') { for (const u of allUids) final.add(u); }
                 else { final.clear(); }
-                rows.push({ action, book: nm, uid: null, all: true, title: '（整本条目）', reason: '' });
+                rows.push({ action, book: nm, uid: null, all: true, title: '(Toàn bộ mục trong sách)', reason: '' });
                 return;
             }
             for (const u of spec.uids) {
@@ -6284,14 +6284,14 @@ function buildConvoExportMd(list, meta) {
     if (!turns.length) return '';
     const m = meta || {};
     const head = [
-        '# 故事神谕对话导出',
+        '# Xuất hội thoại Story Oracle (Thần Dụ Kể Chuyện)',
         '',
-        `- 模式：${String(m.modeLabel == null ? '' : m.modeLabel)}`,
-        `- 聊天：${String(m.chatName == null ? '' : m.chatName)}`,
-        `- 导出时间：${String(m.when == null ? '' : m.when)}`,
-        `- 共 ${turns.length} 条对话`,
+        `- Chế độ: ${String(m.modeLabel == null ? '' : m.modeLabel)}`,
+        `- Cuộc trò chuyện: ${String(m.chatName == null ? '' : m.chatName)}`,
+        `- Thời gian xuất: ${String(m.when == null ? '' : m.when)}`,
+        `- Tổng cộng ${turns.length} lượt đối thoại`,
     ].join('\n');
-    const body = turns.map((t) => `**${t.role === 'user' ? '【我】' : '【神谕】'}**\n\n${t.content}`);
+    const body = turns.map((t) => `**${t.role === 'user' ? '【Tôi】' : '【Story Oracle】'}**\n\n${t.content}`);
     return [head, ...body].join('\n\n---\n\n') + '\n';
 }
 
@@ -6305,7 +6305,7 @@ function soSanitizeFileName(name) {
         .trim()
         .slice(0, 60)
         .replace(/[.\s]+$/, '');
-    return cleaned || '未命名';
+    return cleaned || 'Chua_dat_ten';
 }
 
 // 纯函数：导出文件名 故事神谕-{模式}-{聊天名}-{YYYYMMDD-HHMM}.md。三段都过一遍清洗
@@ -6441,9 +6441,9 @@ function roomHasDiscussion(list) {
 // 其余各模式一句「本模式独立保存」提示。纯函数（传 streamKey + settings），便于单测。
 function streamCueLabel(streamKey, s) {
     if (!streamKey || streamKey === 'main') return null;
-    if (streamKey.startsWith('bld_')) return `访谈记录：${builderTargetLabel(s)}（独立Lưu，切换目标不丢失）`;
-    const noun = { diagnose: '诊断记录', lorebook: '世界书讨论', advisor: '参谋讨论', fix: '校正记录' }[streamKey];
-    return noun ? `${noun}（本模式独立Lưu）` : '本模式记录（独立保存）';
+    if (streamKey.startsWith('bld_')) return `Nhật ký phỏng vấn: ${builderTargetLabel(s)} (Lưu độc lập, không mất khi chuyển mục tiêu)`;
+    const noun = { diagnose: 'Nhật ký chẩn đoán', lorebook: 'Thảo luận Sách thế giới', advisor: 'Thảo luận Tham mưu', fix: 'Nhật ký hiệu chỉnh' }[streamKey];
+    return noun ? `${noun} (Chế độ này lưu độc lập)` : 'Nhật ký chế độ này (Lưu độc lập)';
 }
 function convoMetaKeyFor(streamKey) {
     return (!streamKey || streamKey === 'main') ? CONVO_META_KEY : CONVO_META_KEY + '_' + streamKey;
@@ -7595,7 +7595,7 @@ function adoptPlan(p, intensity) {
     const ok = applyPlanInjection();
     renderPlanBar();
     addSystemNote(
-        (prev ? `已替换原方案『${prev.title || prev.goal}』。` : '') +
+        (prev ? `Đã thay thế phương án cũ『${prev.title || prev.goal}』. ` : '') +
         (ok
             ? '已开始引导：主聊天的 AI 会逐步把剧情推向这个方向（你正常进行 RP 即可）。随时可在上方的方案条里调整强度、查看注入内容、或停止引导。'
             : '方案已保存，但当前 SillyTavern 不支持注入接口（setExtensionPrompt）——引导不会生效，请更新 ST 版本。'),
@@ -7612,8 +7612,8 @@ function endPlan(done) {
     applyPlanInjection();
     renderPlanBar();
     addSystemNote(done
-        ? `方案『${plan.title || plan.goal}』已标记Hoàn tất，引导已停止——主聊天恢复原状。`
-        : `方案『${plan.title || plan.goal}』已Hủy bỏ，引导已停止——主聊天恢复原状。`);
+        ? `Phương án『${plan.title || plan.goal}』đã đánh dấu Hoàn tất, đã dừng dẫn dắt —— chat chính trở lại bình thường.`
+        : `Phương án『${plan.title || plan.goal}』đã Hủy bỏ, đã dừng dẫn dắt —— chat chính trở lại bình thường.`);
 }
 
 /* 条上「完成 / 放弃」两枚钮按【当前构件】分发（1.72.0 起三构件共用这两枚钮；单拍路径原样）。
@@ -7645,7 +7645,7 @@ async function seqSendBack() {
     // 对不上下文的 AI 发言凭空插进那一房（多半是普通聊天），而参谋房里什么都没有。
     if (!advisorMode) return;
     const b = seqActiveBeat(seq);
-    const content = `你当前在${seqProgressLabel(seq)}${b ? `（${b.title || b.goal}）` : ''}。想调整后面的剧情吗？聊好我把剩余的拍重新列给你。`;
+    const content = `Bạn hiện đang ở ${seqProgressLabel(seq)}${b ? ` (${b.title || b.goal})` : ''}. Bạn muốn điều chỉnh cốt truyện phía sau không? Thảo luận xong tôi sẽ liệt kê lại các nhịp còn lại cho bạn.`;
     const entry = { id: ++cidSeq, role: 'assistant', content };
     entry._el = addMessage('assistant', content, entry);
     convo.push(entry);
@@ -7884,14 +7884,14 @@ function seqComplete() {
         setSeq(null);
         applyPlanInjection();
         renderPlanBar();
-        addSystemNote(`序列『${seq.title || '未命名'}』全部拍已Hoàn tất，引导已停止——主聊天恢复原状。`);
+        addSystemNote(`Chuỗi dẫn dắt『${seq.title || 'Chưa đặt tên'}』toàn bộ các nhịp đã Hoàn tất, đã dừng dẫn dắt —— chat chính trở lại bình thường.`);
         return;
     }
     setSeq(seq);
     applyPlanInjection();
     renderPlanBar();
     const b = seqActiveBeat(seq);
-    addSystemNote(`已进入${seqProgressLabel(seq)}：『${b.title || b.goal}』。`);
+    addSystemNote(`Đã chuyển sang ${seqProgressLabel(seq)}:『${b.title || b.goal}』.`);
 }
 
 // 放弃整条序列（带确认——比单拍损失大；同弧线退出惯例）。
@@ -7902,7 +7902,7 @@ async function seqAbandon() {
     setSeq(null);
     applyPlanInjection();
     renderPlanBar();
-    addSystemNote(`序列『${seq.title || '未命名'}』已Hủy bỏ，引导已停止——主聊天恢复原状。`);
+    addSystemNote(`Chuỗi dẫn dắt『${seq.title || 'Chưa đặt tên'}』đã Hủy bỏ, đã dừng dẫn dắt —— chat chính trở lại bình thường.`);
 }
 
 // One-time staleness ping: a silent perpetual injection is how "the AI keeps
@@ -7934,7 +7934,7 @@ function checkPlanReminder() {
         seq.reminded = true;
         setSeq(seq);
         const b = seqActiveBeat(seq);
-        addSystemNote(`序列引导仍在进行（${seqProgressLabel(seq)}${b ? `：${b.title || b.goal}` : ''}）——这一拍已持续 ${n} 条消息。若已达成可点「Hoàn tất」进入下一拍，或「找Cố vấn改改」调整。`);
+        addSystemNote(`Chuỗi dẫn dắt vẫn đang diễn ra (${seqProgressLabel(seq)}${b ? `: ${b.title || b.goal}` : ''}) —— Nhịp này đã kéo dài ${n} tin nhắn. Nếu đã đạt mục tiêu, có thể bấm "Hoàn tất" để sang nhịp tiếp theo, hoặc "Tìm Tham mưu để sửa" để điều chỉnh.`);
         return;
     }
     const plan = active.plan;
@@ -7943,7 +7943,7 @@ function checkPlanReminder() {
     if (n >= ADVISOR_REMIND_AFTER) {
         plan.reminded = true;
         setPlan(plan);
-        addSystemNote(`引导方案『${plan.title || plan.goal}』已持续 ${n} 条消息——剧情推进到了吗？可以在剧情Cố vấn模式里问我「检查进度」，或在上方方案条里Hoàn tất / 调整它。`);
+        addSystemNote(`Phương án dẫn dắt『${plan.title || plan.goal}』đã kéo dài ${n} tin nhắn —— Cốt truyện đã tiến triển tới đó chưa? Bạn có thể hỏi tôi "Kiểm tra tiến độ" trong chế độ Tham mưu, hoặc Hoàn tất / Điều chỉnh trên thanh phương án ở phía trên.`);
     }
 }
 
@@ -13565,7 +13565,7 @@ async function applyFix(patchBlock, statusEl, expectStatKey, replyText) {
     }
     const Mvu = await getMvu();
     if (!Mvu || typeof Mvu.parseMessage !== 'function') {
-        statusEl.textContent = '未检测到 MVU —— 无法自动应用。';
+        statusEl.textContent = 'Không phát hiện thấy MVU —— Không thể tự động áp dụng.';
         statusEl.classList.add('so-hint-error');
         return null;
     }
@@ -13575,7 +13575,7 @@ async function applyFix(patchBlock, statusEl, expectStatKey, replyText) {
     // ⚠ 取数走 diagStatOf（与读侧 getMvuStatData 同一份回退口径，FIX 5）：直接写 oldData.stat_data 会在
     // 「没有 stat_data 的退化 MvuData」上与读侧永久失和 → 这道闸恒触发、且给的建议永远无效。
     if (expectStatKey != null && diagStatKey(diagStatOf(oldData)) !== expectStatKey) {
-        statusEl.textContent = '状态已变化（这份补丁是按当时的状态算的），未写入。请重新诊断。';
+        statusEl.textContent = 'Trạng thái đã thay đổi (bản vá này được tính theo trạng thái lúc đó), chưa ghi dữ liệu. Vui lòng chẩn đoán lại.';
         statusEl.classList.add('so-hint-error');
         return null;
     }
@@ -13614,7 +13614,7 @@ async function applyFix(patchBlock, statusEl, expectStatKey, replyText) {
     }
     // swipe 钉（审计簇 M1）：解析等待期间换了楼 / 划了 swipe → 放弃，绝不把 A swipe 算的状态写进 B。
     if (diagPinMoved(swipePin, diagCaptureSwipe())) {
-        statusEl.textContent = '这条消息在应用期间被切换（楼层或 swipe 已变），未写入。请重试。';
+        statusEl.textContent = 'Tin nhắn này đã bị chuyển đổi trong khi đang áp dụng (tầng tin nhắn hoặc swipe đã đổi), chưa ghi dữ liệu. Vui lòng thử lại.';
         statusEl.classList.add('so-hint-error');
         return null;
     }
@@ -15340,7 +15340,7 @@ function mvuedMaybeRefresh(reason) {
         const status = card.querySelector('#so-mvued-status');
         if (status) {
             status.classList.remove('so-hint-error');
-            status.textContent = '⚠ 剧情刚更新了变量：你没动过的值已同步为最新，你改过的保持不变。';
+            status.textContent = '⚠ Cốt truyện vừa cập nhật biến: các giá trị bạn chưa chỉnh đã được đồng bộ mới nhất, các giá trị bạn đã sửa được giữ nguyên.';
         }
     }
     console.debug('[Story Oracle] 🎛 变量编辑器：已随外部改动刷新（' + (reason || '') + '）');
@@ -15506,7 +15506,7 @@ function renderTrainerReadout() {
     // 清空，见该变量声明处的注释）。这里必须核对身份，否则用户在当前聊天打开 🎛 页会把另一个聊天的
     // 改动看成这一个聊天的「上一回合」——比什么都不显示更糟，因为它看起来完全成立。
     if (!trainerLastRun || trainerLastRun.chatKey !== fixChatKey()) {
-        el.textContent = '（本次打开后还没有新回复经过修改器。）';
+        el.textContent = '（Chưa có phản hồi mới nào đi qua bộ sửa đổi trong phiên này.）';
         return;
     }
     const { changes, skipped, stamp, failed, notice } = trainerLastRun;
@@ -15514,7 +15514,7 @@ function renderTrainerReadout() {
     // 「改了 N 项」是三种互斥的读数，必须先分岔，不能落进 changes.length 的判断（那会把「没跑成」
     // 误显示成「跑了但没什么可改」，用户没法分辨规则是不是还活着）。
     if (failed) {
-        el.textContent = `上一回合：修改器未能写入（${failed}），规则这一轮没生效。${stamp ? ' · ' + stamp : ''}`;
+        el.textContent = `Lượt trước: Bộ sửa đổi không thể ghi (${failed}), quy tắc chưa có hiệu lực ở lượt này.${stamp ? ' · ' + stamp : ''}`;
         return;
     }
     const head = changes.length
@@ -15846,12 +15846,12 @@ function updateMvuedScanBtn() {
     if (hint) hint.style.display = (!mvuedScanning && !mvuedSchemaCache) ? '' : 'none';
     b.disabled = false;
     if (mvuedScanning) {
-        b.textContent = '⏹ 中断扫描';
-        b.title = '中断这一次分析（不会写入任何缓存，随后可重新扫描）';
+        b.textContent = '⏹ Dừng quét';
+        b.title = 'Dừng lượt phân tích này (sẽ không lưu cache, có thể quét lại sau)';
         return;
     }
-    b.textContent = mvuedSchemaCache ? '🔍 重新扫描取值规则' : '🔍 分析取值规则';
-    b.title = 'AI 读一遍卡的规则后：该选的变下拉菜单、有范围的数字加滑杆——只问一次，本聊天记住';
+    b.textContent = mvuedSchemaCache ? '🔍 Quét lại quy tắc giá trị' : '🔍 Phân tích quy tắc giá trị';
+    b.title = 'AI đọc qua quy tắc của thẻ: mục chọn chuyển thành menu thả xuống, số có phạm vi thêm thanh trượt — chỉ hỏi một lần, ghi nhớ cho chat này';
 }
 
 // 搜索命中口径（单一实现，页签计数与节点显隐共用，两者绝不各写一套）：
@@ -15919,7 +15919,7 @@ function renderMvuedBody() {
         b.type = 'button';
         b.className = 'so-mvued-tab' + (mvuedActiveTab === trainerTabIdx ? ' so-mvued-tab-on' : '');
         const n = trainerRulesForRender.length;
-        b.textContent = '🎛 修改器' + (n ? `（${n}）` : '');
+        b.textContent = '🎛 Bộ sửa đổi' + (n ? ` (${n})` : '');
         b.addEventListener('click', () => { mvuedActiveTab = trainerTabIdx; renderMvuedBody(); });
         tabsEl.appendChild(b);
     }
@@ -15936,7 +15936,7 @@ function renderTrainerTab(bodyEl) {
     if (!rules.length) {
         const empty = document.createElement('div');
         empty.className = 'so-hint';
-        empty.textContent = '还没有任何规则。到左边的页签里点某个字段右侧的 🔒 就能把它冻结；'
+        empty.textContent = 'Chưa có quy tắc nào. Sang tab bên trái bấm vào biểu tượng 🔒 bên phải trường dữ liệu để đóng băng nó;'
             + '冻结之后可以在这里改成「每回合 ±X」或「上下限」。';
         bodyEl.appendChild(empty);
     }
@@ -15965,17 +15965,17 @@ function renderTrainerTab(bodyEl) {
 
         const desc = document.createElement('span');
         desc.className = 'so-mvued-rule-desc';
-        desc.textContent = r.kind === 'freeze' ? `锁定在 ${r.value}`
+        desc.textContent = r.kind === 'freeze' ? `Khóa ở ${r.value}`
             : (r.kind === 'step' ? `每回合 ${r.delta >= 0 ? '+' : ''}${r.delta}`
                 : [r.min != null ? `不低于 ${r.min}` : '', r.max != null ? `不超过 ${r.max}` : ''].filter(Boolean).join('、'));
-        if (!alive) desc.textContent += '　·　字段已不存在（每回合跳过）';
+        if (!alive) desc.textContent += '　·　Trường không còn tồn tại (bỏ qua mỗi lượt)';
         row.appendChild(desc);
 
         const del = document.createElement('button');
         del.type = 'button';
         del.className = 'so-lb-mini';
         del.textContent = '✕';
-        del.title = '删除这条规则';
+        del.title = 'Xóa quy tắc này';
         del.addEventListener('click', () => { trainerRemoveRule(r.path, r.kind); renderMvuedBody(); });
         row.appendChild(del);
         bodyEl.appendChild(row);
@@ -16002,10 +16002,10 @@ function renderTrainerAddForm(rules) {
     for (const [v, t] of [['step', '每回合 ±X'], ['clamp', '上下限']]) {
         const o = document.createElement('option'); o.value = v; o.textContent = t; kind.appendChild(o);
     }
-    const a = document.createElement('input'); a.type = 'number'; a.placeholder = '±X / 下限';
-    const b = document.createElement('input'); b.type = 'number'; b.placeholder = '上限';
+    const a = document.createElement('input'); a.type = 'number'; a.placeholder = '±X / Giới hạn dưới';
+    const b = document.createElement('input'); b.type = 'number'; b.placeholder = 'Giới hạn trên';
     const add = document.createElement('button');
-    add.type = 'button'; add.className = 'so-lb-mini'; add.textContent = '添加';
+    add.type = 'button'; add.className = 'so-lb-mini'; add.textContent = 'Thêm';
     add.addEventListener('click', () => {
         const path = JSON.parse(sel.value);
         if (kind.value === 'step') {
@@ -16030,7 +16030,7 @@ function updateMvuedFoot() {
     const card = document.getElementById('so-mvued-card');
     if (!card) return;
     const n = mvuedDirty.size;
-    card.querySelector('#so-mvued-count').textContent = n ? `已改 ${n} 项` : '';
+    card.querySelector('#so-mvued-count').textContent = n ? `Đã sửa ${n} mục` : '';
     const apply = card.querySelector('#so-mvued-apply');
     apply.disabled = !n || mvuedApplying;   // 在途写入期间恒禁用（改值触发的重画不得把它点亮）
     apply.textContent = n ? `Áp dụng (${n})` : 'Áp dụng';
@@ -16085,7 +16085,7 @@ function renderMvuedLeaf(nd, q) {
         }
         if (!nd.options.includes(String(cur))) {
             const op = document.createElement('option');
-            op.value = String(cur); op.textContent = String(cur) + '（当前值）';
+            op.value = String(cur); op.textContent = String(cur) + ' (Giá trị hiện tại)';
             sel.appendChild(op);
         }
         sel.value = String(cur);
@@ -16093,7 +16093,7 @@ function renderMvuedLeaf(nd, q) {
         row.appendChild(sel);
         const pen = document.createElement('button');
         pen.type = 'button'; pen.className = 'so-lb-mini'; pen.textContent = '✎';
-        pen.title = '自由输入（扫描结果可能不全）';
+        pen.title = 'Nhập tự do (kết quả quét có thể không đầy đủ)';
         pen.addEventListener('click', () => {
             const d = mvuedDirty.get(mvuedPathStr(nd.path));   // 已在下拉里改过 → 带着改后的值切文本框，别退回渲染时的旧值
             sel.replaceWith(mvuedTextInput(nd, d ? d.value : cur, redirty));
@@ -16159,7 +16159,7 @@ function renderMvuedLeaf(nd, q) {
         asList.type = 'button';
         asList.className = 'so-lb-mini';
         asList.textContent = '≡';
-        asList.title = '当作列表显示——这其实是两项列表、不是数值+描述';
+        asList.title = 'Hiển thị dưới dạng danh sách — đây thực chất là danh sách 2 mục, không phải giá trị + mô tả';
         asList.addEventListener('click', () => { mvuedSetListOverride(nd.path, true); });
         row.appendChild(asList);
     }
@@ -16176,7 +16176,7 @@ function renderMvuedLeaf(nd, q) {
         // 不再自建一条 .so-mvued-lock-on。
         lock.classList.toggle('active', frozen);
         lock.textContent = '🔒';
-        lock.title = frozen ? '已冻结——点一下解冻（每回合±X / 上下限不受影响）' : '冻结在当前值（每条新回复都会拉回来）';
+        lock.title = frozen ? 'Đã đóng băng — bấm để mở khóa (±X / giới hạn trên dưới mỗi lượt không bị ảnh hưởng)' : 'Đóng băng ở giá trị hiện tại (mỗi phản hồi mới sẽ tự động kéo về số này)';
         lock.addEventListener('click', () => {
             if (frozen) trainerRemoveRule(nd.path, 'freeze');
             // 冻结目标 = 用户【眼前】的值：脏表里有就用脏值（他正要改成那个数），否则用现值。
@@ -16221,7 +16221,7 @@ function mvuedBigEditBtn(input, label, desc) {
     b.type = 'button';
     b.className = 'so-lb-mini';
     b.textContent = '⤢';
-    b.title = '放大编辑';
+    b.title = 'Phóng to để chỉnh sửa';
     b.addEventListener('click', () => { openMvuedBigEdit(input, label, desc); });
     return b;
 }
@@ -16341,7 +16341,7 @@ function renderMvuedList(nd, q) {
         back.type = 'button';
         back.className = 'so-lb-mini';
         back.textContent = '⇄';
-        back.title = '当作数值+描述显示';
+        back.title = 'Hiển thị dưới dạng giá trị + mô tả';
         back.addEventListener('click', () => { mvuedSetListOverride(nd.path, false); });
         head.appendChild(back);
     }
@@ -16385,7 +16385,7 @@ function renderMvuedList(nd, q) {
         }
         const del = document.createElement('button');
         del.type = 'button'; del.className = 'so-lb-mini'; del.textContent = '➖';
-        del.title = '删除这一项';
+        del.title = 'Xóa mục này';
         del.addEventListener('click', () => {
             const next = mvuedListValue(nd);
             next.splice(i, 1);
@@ -16396,7 +16396,7 @@ function renderMvuedList(nd, q) {
         box.appendChild(row);
     });
     const add = document.createElement('button');
-    add.type = 'button'; add.className = 'so-lb-mini'; add.textContent = '＋ 添加一项';
+    add.type = 'button'; add.className = 'so-lb-mini'; add.textContent = '＋ Thêm một mục';
     add.addEventListener('click', () => {
         const next = mvuedListValue(nd);
         next.push(mvuedBlankLike(next[next.length - 1]));
@@ -18034,13 +18034,13 @@ function addNoteUndoControls(wrap, info) {
             const okGo = await uiConfirm(undone
                 ? 'Trạng thái đã thay đổi sau đó, áp dụng có thể ghi đè các thay đổi sau. Xác nhận?'
                 : 'Trạng thái đã thay đổi sau đó, hoàn tác sẽ đưa các thay đổi sau trở lại. Xác nhận?');
-            if (!okGo) { status.textContent = '已取消。'; btn.disabled = false; return; }
+            if (!okGo) { status.textContent = 'Đã hủy.'; btn.disabled = false; return; }
         }
         if (!undone) {
             // undoFix 是整份互换：没有快照就没有靶子（replaceMvuData(null) 会把整份状态换成 null）。
             // 调用方（addNoteMessage）已经把这种记录挡在门外了，这一行是不给第二个调用方留坑。
-            if (!snapshot) { status.textContent = '没有可还原的快照。'; btn.disabled = true; return; }
-            status.textContent = '正在还原…';
+            if (!snapshot) { status.textContent = 'Không có snapshot nào để khôi phục.'; btn.disabled = true; return; }
+            status.textContent = 'Đang khôi phục…';
             try {
                 await undoFix(snapshot);
                 await removeDiagWriteBack(writeBack);   // 连正文里那段一起摘掉，否则「重新处理变量」会把它算回来
@@ -18050,13 +18050,13 @@ function addNoteUndoControls(wrap, info) {
                 // Task 7：还原也是一次 MVU 写入（整份互换），落点同样是最末非系统楼 —— 落在用户楼上时
                 // 同样看不见。现算，绝不缓存（`.so-apply-status` 是 pre-line，换行真的换行）。
                 const n = diagUserFloorNotice();
-                status.textContent = '已还原到修复前的状态。' + (n ? '\n' + n : '');
+                status.textContent = 'Đã khôi phục về trạng thái trước khi sửa chữa.' + (n ? '\n' + n : '');
             } catch (e) {
-                status.textContent = '还原失败：' + (e?.message || e);
+                status.textContent = 'Khôi phục thất bại: ' + (e?.message || e);
                 status.classList.add('so-hint-error');
             }
         } else {
-            status.textContent = '正在重新应用…';
+            status.textContent = 'Đang áp dụng lại…';
             try {
                 // applyFix 回 { snapshot, applied, report }；null = 一个字都没写（原因已写在 status 上）。
                 // 判据是 r 而不是 r.snapshot：读不到写入【前】的状态时 snapshot 会是 null，但那一份【确实
@@ -18078,7 +18078,7 @@ function addNoteUndoControls(wrap, info) {
                         : '已重新应用。') + repairDiagNote(r.repair) + (n ? '\n' + n : '');
                 }
             } catch (e) {
-                status.textContent = '重新应用失败：' + (e?.message || e);
+                status.textContent = 'Áp dụng lại thất bại: ' + (e?.message || e);
                 status.classList.add('so-hint-error');
             }
         }
@@ -18098,10 +18098,10 @@ function addAutoFixControls(wrap, info) {
     bar.className = 'so-apply-bar so-note-undo';
     const swapBtn = document.createElement('button');
     swapBtn.className = 'so-apply-btn';
-    swapBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 用原文';
+    swapBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Dùng bản gốc';
     const diffBtn = document.createElement('button');
     diffBtn.className = 'so-apply-btn';
-    diffBtn.innerHTML = '<i class="fa-solid fa-eye"></i> 看改动';
+    diffBtn.innerHTML = '<i class="fa-solid fa-eye"></i> Xem thay đổi';
     const status = document.createElement('span');
     status.className = 'so-apply-status';
     bar.appendChild(swapBtn);
@@ -18118,17 +18118,17 @@ function addAutoFixControls(wrap, info) {
         const ok = await selectSwipe(info.idx, targetSwipe);
         if (!ok) {
             // swipe 不在了（用户重 roll / 删了）——这条记录的切换不再可靠，停用。
-            status.textContent = '无法切换（原 swipe 已不在）。';
+            status.textContent = 'Không thể chuyển đổi (swipe gốc không còn tồn tại).';
             status.classList.add('so-hint-error');
             return;   // 留 disabled
         }
         showingOriginal = !showingOriginal;
         if (showingOriginal) {
-            swapBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 用校正稿';
-            status.textContent = '已切回原文。';
+            swapBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Dùng bản hiệu chỉnh';
+            status.textContent = 'Đã chuyển về bản gốc.';
         } else {
-            swapBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 用原文';
-            status.textContent = '已切回校正稿。';
+            swapBtn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Dùng bản gốc';
+            status.textContent = 'Đã chuyển về bản hiệu chỉnh.';
         }
         swapBtn.disabled = false;
     });
@@ -18175,7 +18175,7 @@ function addMvuedUndoControls(wrap, info) {
     btn.addEventListener('click', async () => {
         status.classList.remove('so-hint-error');
         btn.disabled = true;
-        status.textContent = undone ? '正在重新应用…' : '正在还原…';
+        status.textContent = undone ? 'Đang áp dụng lại…' : 'Đang khôi phục…';
         try {
             const Mvu = await getMvu();
             if (!Mvu || typeof Mvu.replaceMvuData !== 'function') throw new Error('未检测到 MVU');
@@ -18198,7 +18198,7 @@ function addMvuedUndoControls(wrap, info) {
                 const okGo = await uiConfirm(undone
                     ? '这条记录之后状态又变过（别的应用 / 新回复）。重新应用会把整份变量换成本次编辑【之后】的那一版，后来的变化会一并丢失。确定吗？'
                     : '这条记录之后状态又变过（别的应用 / 新回复）。撤销会连同后来的变化一起回退，确定吗？');
-                if (!okGo) { status.textContent = '已取消。'; btn.disabled = false; return; }
+                if (!okGo) { status.textContent = 'Đã hủy.'; btn.disabled = false; return; }
             }
             await Mvu.replaceMvuData(JSON.parse(JSON.stringify(target)), mvuMsgOpts());
             refreshLatestMvuBar();   // replaceMvuData 不发刷新事件，状态栏得自己踢一下
@@ -18229,9 +18229,9 @@ function addMvuedUndoControls(wrap, info) {
             // 纹丝不动。诊断卡（addApplyControls）与自动记录条（addNoteUndoControls）的撤销 / 重新应用
             // 早就说这句话，唯独编辑器这条记录一直静默。现算（见 diagUserFloorNotice 头注）。
             const n = diagUserFloorNotice();
-            status.textContent = (undone ? '已还原到编辑前的状态。' : '已重新应用。') + (n ? '\n' + n : '');
+            status.textContent = (undone ? 'Đã khôi phục về trạng thái trước khi chỉnh sửa.' : 'Đã áp dụng lại.') + (n ? '\n' + n : '');
         } catch (e) {
-            status.textContent = '操作失败：' + (e && e.message ? e.message : e);
+            status.textContent = 'Thao tác thất bại: ' + (e && e.message ? e.message : e);
             status.classList.add('so-hint-error');
         }
         btn.disabled = false;
@@ -18316,7 +18316,7 @@ function injectChatBarButton() {
     const btn = document.createElement('div');
     btn.id = 'so-chatbar-button';
     btn.className = 'fa-solid fa-moon interactable';
-    btn.title = 'Story Oracle —— 点击开 / 关侧窗';
+    btn.title = 'Story Oracle —— Bấm để Mở / Đóng cửa sổ bên';
     btn.tabIndex = 0;
     btn.addEventListener('click', () => toggleWindow());   // 无参 = 切换开 / 关
     bar.appendChild(soMarkEntryLive(btn));
@@ -18384,8 +18384,8 @@ function injectFixSelBarButton() {
     btn.id = FIXSEL_BAR_BTN_ID;
     btn.className = 'qr--button menu_button interactable';
     btn.setAttribute('tabindex', '0');
-    btn.title = '选段校正 —— 在最新一条回复里划选一段再点我（不划选 = 直接开卡）';
-    btn.textContent = '✂️ 选段校正';
+    btn.title = 'Hiệu chỉnh đoạn chọn —— Bôi đen một đoạn trong phản hồi mới nhất rồi bấm vào đây (không chọn = mở trực tiếp thẻ)';
+    btn.textContent = '✂️ Hiệu chỉnh đoạn chọn';
     const go = (e) => {
         if (e && e.preventDefault) { e.preventDefault(); e.stopPropagation(); }
         // 这颗按钮【常驻】，可能在还没有 AI 回复时被点到——楼层入口那颗不会（它只长在 AI 楼层上）。
@@ -19215,7 +19215,7 @@ function bindControls() {
         // into the floating container by the time this fires.
         const pre = planBarEl.querySelector('#so-plan-directive');
         const open = pre.classList.toggle('open');
-        planBarEl.querySelector('#so-plan-show').textContent = open ? '▾ 收起注入内容' : '▸ 查看注入内容';
+        planBarEl.querySelector('#so-plan-show').textContent = open ? '▾ Thu gọn nội dung dẫn dắt' : '▸ Xem nội dung dẫn dắt';
         if (open) pre.textContent = currentInjectionPreview();   // type-aware (arc beat OR single plan)
         else pre.classList.remove('peek');                       // closing a blind spoiler re-masks it next open
     });
@@ -19294,7 +19294,7 @@ function bindControls() {
     win.querySelector('#so-arc-mode').addEventListener('change', (e) => {
         const blind = e.target.value === 'blind';
         win.querySelector('#so-arc-blind-fields').style.display = blind ? 'block' : 'none';
-        win.querySelector('#so-arc-create').textContent = blind ? '创建盲盒弧' : '创建透明弧';
+        win.querySelector('#so-arc-create').textContent = blind ? 'Tạo Hồi truyện hộp mù' : 'Tạo Hồi truyện minh bạch';
         // 路标说明随模式变：盲盒可留空（神谕自动起草整条骨架）；透明你看得到每一拍，必须自己填。
         const wpLabel = win.querySelector('#so-arc-waypoints-label');
         if (wpLabel) wpLabel.textContent = blind
@@ -19355,8 +19355,8 @@ function bindControls() {
             b.type = 'button';
             b.id = 'so-lb-smart';
             b.className = 'so-lb-mini so-lb-mini-magic';
-            b.title = '智能选条：用一句话让 AI 帮你勾选 / 取消条目（只动勾选、可一键还原）';
-            b.textContent = '🪄 智能选条';
+            b.title = 'Chọn mục thông minh: Ra lệnh bằng một câu để AI chọn / bỏ chọn mục giúp bạn (chỉ thay đổi tích chọn, hoàn tác dễ dàng)';
+            b.textContent = '🪄 Chọn mục thông minh';
             b.addEventListener('click', () => openSmartSelect());
             tools.insertBefore(b, tools.firstChild);
         }
@@ -19471,7 +19471,7 @@ function bindControls() {
             btn.innerHTML = '<i class="fa-solid fa-check"></i>';
             setTimeout(() => { btn.innerHTML = '<i class="fa-solid fa-copy"></i>'; }, 1200);
         } else {
-            btn.title = '复制失败 —— 请手动选择文本';
+            btn.title = 'Sao chép thất bại —— Vui lòng chọn văn bản thủ công';
         }
     });
     win.querySelector('#so-builder-btn')?.addEventListener('click', toggleBuilder);
@@ -19954,7 +19954,7 @@ function bindControls() {
             // 内置示例删不掉（它根本不在 fixTemplates 里，deleteFixTemplate 会静默 false）——先说一句，
             // 否则用户点了确认框、什么也没发生，看着像坏了。
             if (fixTemplateIsBuiltin(name)) { toastr.info('Không thể xóa ví dụ mẫu tích hợp'); return; }
-            if (!(await uiConfirm(`Xóa模板「${name}」？`))) return;
+            if (!(await uiConfirm(`Xác nhận xóa mẫu「${name}」?`))) return;
             if (deleteFixTemplate(name)) {
                 // 删掉后下拉会落到【另一份】模板上（populateFixTemplates 的 prev 已不存在）——必须把选择态
                 // 与正文一起搬过去认领它，否则「配置说没选、下拉显示着 A、正文却空着」，再点一次保存就把
@@ -19971,7 +19971,7 @@ function bindControls() {
         });
         win.querySelector('#so-fixc-mech').addEventListener('change', async (e) => {
             if (!e.target.checked && !getSettings().customFixWarned) {
-                const ok = await uiConfirm('关掉后，状态栏 / 变量块也会一起交给模板，模板输出会原样替换整条回复。原文仍留在 swipe 0。确定？');
+                const ok = await uiConfirm('Khi tắt, thanh trạng thái / khối biến cũng sẽ được giao cho mẫu, kết quả của mẫu sẽ thay thế toàn bộ phản hồi ban đầu. Bản gốc vẫn được giữ ở swipe 0. Xác nhận?');
                 if (!ok) { e.target.checked = true; return; }
                 getSettings().customFixWarned = true; save();
             }
@@ -20033,7 +20033,7 @@ function bindControls() {
     });
     win.querySelector('#so-sysprompt-reset').addEventListener('click', async () => {
         const def = sysPromptModeDef(sysPromptEditMode);
-        if (!(await uiConfirm(`Xác nhận把「${def.label}」的系统提示词Đặt lại为内置默认吗？当前的修改会丢失。`))) return;
+        if (!(await uiConfirm(`Xác nhận đặt lại System Prompt của「${def.label}」về mặc định tích hợp? Các chỉnh sửa hiện tại sẽ bị mất.`))) return;
         const s2 = getSettings();
         if (def.id === 'chat') s2.systemPrompt = DEFAULT_SYSTEM_PROMPT;  // 恢复随扩展附带的默认
         else s2[def.key] = '';                                          // 清空覆盖 → 退回内置
@@ -20359,13 +20359,13 @@ function updateWiHint() {
     if (!hint) return;
     const mode = win.querySelector('#so-wi').value;
     if (mode === 'st') {
-        hint.textContent = '像主提示词一样扫描聊天：蓝色（常驻）条目始终注入，绿色（关键词）条目在其关键词匹配时注入。神谕侧聊最近几条问答（按世界书「扫描深度」）同样参与匹配。';
+        hint.textContent = 'Quét cuộc trò chuyện giống như prompt chính: các mục màu xanh lam (thường trực) luôn được chèn, các mục màu xanh lục (từ khóa) được chèn khi khớp từ khóa. Các câu hỏi đáp gần đây của Story Oracle cũng tham gia khớp từ khóa.';
     } else if (mode === 'all') {
-        hint.textContent = '无视关键词，发送所有已启用的世界书条目。适合做规划，但可能会消耗大量 token。';
+        hint.textContent = 'Bỏ qua từ khóa, gửi toàn bộ các mục Sách thế giới đang bật. Phù hợp để lên kế hoạch, nhưng có thể tiêu tốn lượng lớn token.';
     } else if (mode === 'char') {
-        hint.textContent = '只扫描角色相关世界书（角色卡内嵌 + 角色绑定 + 本对话绑定），排除全局与人设世界书；蓝灯常驻 + 绿灯关键词匹配照常（含神谕侧聊最近问答）。';
+        hint.textContent = 'Chỉ quét Sách thế giới liên quan đến nhân vật (nhúng trong thẻ + liên kết nhân vật + liên kết hội thoại này), loại trừ Sách thế giới toàn cục và Persona; thường trực + khớp từ khóa vẫn hoạt động bình thường.';
     } else if (mode === 'custom') {
-        hint.textContent = '神谕读世界书时只用你在下方勾选的条目——无视关键词与启用 / 禁用状态（开了混合模式会再加上已选书里当前触发的绿灯）。选择按【本聊天】记忆；一本书第一次进入范围时会按当前激活情况预选一份。变量规则条目（[mvu_update]）只喂诊断，这里不列出；token 估算不含混合模式追加与 EJS 展开。';
+        hint.textContent = 'Story Oracle khi đọc Sách thế giới chỉ dùng các mục bạn tích chọn bên dưới — bỏ qua từ khóa và trạng thái bật / tắt (khi bật chế độ kết hợp sẽ cộng thêm các mục xanh lục kích hoạt hiện tại). Ghi nhớ lựa chọn theo cuộc trò chuyện này; khi một cuốn sách lần đầu vào phạm vi sẽ chọn sẵn theo kích hoạt hiện tại. Các mục quy tắc biến ([mvu_update]) chỉ cấp cho Chẩn đoán, không liệt kê tại đây; ước tính token không bao gồm phần bổ sung của chế độ kết hợp và mở rộng EJS.';
     } else {
         hint.textContent = '';
     }
@@ -20385,10 +20385,10 @@ function updateBadge() {
     const s = getSettings();
     let label = '';
     if (s.mode === 'direct') {
-        label = s.model || '未设置模型';
+        label = s.model || 'Chưa đặt mô hình';
     } else {
         const p = getProfiles().find((x) => x.id === s.profileId);
-        label = p ? p.name : '未选择配置文件';
+        label = p ? p.name : 'Chưa chọn hồ sơ kết nối';
     }
     modeBadge.textContent = label ? `· ${label}` : '';
 }
@@ -20410,13 +20410,13 @@ function getProfiles() {
 function profilesStatus() {
     const ctx = getCtx();
     if (!ctx.ConnectionManagerRequestService) {
-        return '当前 ST 版本未找到连接管理器 —— 请改用直连模式。';
+        return 'Phiên bản SillyTavern hiện tại không tìm thấy Trình quản lý kết nối —— Vui lòng chuyển sang chế độ kết nối trực tiếp.';
     }
     const raw = ctx.extensionSettings?.connectionManager?.profiles;
     if (!Array.isArray(raw) || raw.length === 0) {
-        return '未找到已保存的配置文件。请先在 ST 的“连接配置文件”面板中创建一个（API 设置里的书签图标）。';
+        return 'Không tìm thấy hồ sơ kết nối đã lưu. Vui lòng tạo trước trong bảng "Hồ sơ kết nối" của SillyTavern (biểu tượng bookmark trong Cài đặt API).';
     }
-    return '存在配置文件，但似乎没有兼容的。请尝试刷新按钮，或改用直连模式。';
+    return 'Có hồ sơ kết nối, nhưng dường như không có cái nào tương thích. Hãy thử bấm nút làm mới, hoặc chuyển sang chế độ trực tiếp.';
 }
 
 function refreshProfiles() {
@@ -20428,12 +20428,12 @@ function refreshProfiles() {
     if (!profiles.length) {
         const opt = document.createElement('option');
         opt.value = '';
-        opt.textContent = '— 无 —';
+        opt.textContent = '— Không có —';
         sel.appendChild(opt);
         if (hint) hint.textContent = profilesStatus();
         return;
     }
-    if (hint) hint.textContent = '通过 ST 服务器转发（无 CORS）。新增配置文件后请点击刷新。';
+    if (hint) hint.textContent = 'Chuyển tiếp qua máy chủ SillyTavern (không bị CORS). Sau khi thêm hồ sơ mới vui lòng bấm làm mới.';
     for (const p of profiles) {
         const opt = document.createElement('option');
         opt.value = p.id;
@@ -21242,12 +21242,12 @@ function onDocClickOutside(e) {
  * 都在这里统一处理）——各 toggle 只负责自己的进入/退出提示。
  * ------------------------------------------------------------------ */
 const MODE_PLACEHOLDERS = {
-    chat: '就当前剧情提问…（Enter 发送，Shift+Enter 换行）',
-    diagnose: '描述哪里看起来不对，或让我检查最新一次更新 / 审计当前状态…',
-    lorebook: '问问这本世界书，或让我改写 / 新增 / 删除某个条目…',
-    advisor: '聊聊剧情接下来可以怎么走…（出方案后可一键开始引导）',
-    fix: '想怎么改最新这条回复都行——重写、删改、换语气、调节奏、改设定…说出来，我来改一版…',
-    builder: '告诉我你想打造谁——完善你自己的角色，还是创造 / 充实一个 NPC…',
+    chat: 'Hỏi về cốt truyện hiện tại… (Enter để gửi, Shift+Enter xuống dòng)',
+    diagnose: 'Mô tả điểm bất thường, hoặc để tôi kiểm tra lần cập nhật mới nhất / kiểm toán trạng thái hiện tại…',
+    lorebook: 'Hỏi về Sách thế giới này, hoặc để tôi viết lại / thêm mới / xóa một mục nào đó…',
+    advisor: 'Trao đổi về hướng đi tiếp theo của cốt truyện… (sau khi có phương án có thể bắt đầu dẫn dắt)',
+    fix: 'Muốn sửa phản hồi mới nhất thế nào cũng được — viết lại, thêm bớt, đổi giọng điệu, chỉnh nhịp độ, đổi thiết lập… hãy nói ra để tôi sửa một bản…',
+    builder: 'Hãy cho tôi biết bạn muốn tạo ai — hoàn thiện nhân vật của bạn, hay tạo / làm dày thêm một NPC…',
 };
 
 // 各模式的空状态：模式图标 + 引导语 +（可选）副标题 + 示例 chip。点一下 chip 把问题填进输入框
@@ -21256,36 +21256,36 @@ const MODE_PLACEHOLDERS = {
 const MODE_EMPTY = {
     chat: {
         icon: 'fa-moon',
-        lead: '关于当前剧情，尽管问吧。',
-        sub: '此窗口与主聊天相互独立。',
-        chips: ['接下来可能会发生什么？', '这个角色现在的处境如何？', '帮我理一下当前的剧情线。'],
+        lead: 'Cứ tự nhiên hỏi về cốt truyện hiện tại nhé.',
+        sub: 'Cửa sổ này hoàn toàn độc lập với cuộc trò chuyện chính.',
+        chips: ['Điều gì có thể xảy ra tiếp theo?', 'Tình cảnh hiện tại của nhân vật này thế nào?', 'Giúp tôi tóm tắt mạch cốt truyện hiện tại.'],
     },
     diagnose: {
         icon: 'fa-stethoscope',
-        lead: '检查并修复 MVU 变量状态。',
-        chips: ['检查最新一条回复有没有问题。', '审计一下当前的整个状态。'],
+        lead: 'Kiểm tra và sửa chữa biến trạng thái MVU.',
+        chips: ['Kiểm tra xem phản hồi mới nhất có vấn đề gì không.', 'Kiểm toán toàn bộ trạng thái hiện tại.'],
     },
     lorebook: {
         icon: 'fa-book',
-        lead: '聊聊或修改这本世界书。',
-        chips: ['这本世界书都写了些什么？', '帮我新增一个条目。', '找找条目之间有没有矛盾。'],
+        lead: 'Tra cứu hoặc sửa đổi Sách thế giới này.',
+        chips: ['Sách thế giới này viết về những gì?', 'Giúp tôi thêm một mục mới.', 'Tìm xem giữa các mục có mâu thuẫn nào không.'],
     },
     advisor: {
         icon: 'fa-compass',
-        lead: '一起构思剧情接下来怎么走。',
-        chips: ['接下来剧情可以怎么走？给我几个方向。', '基于现在的局势，提一个值得推进的转折。'],
+        lead: 'Cùng nhau lên ý tưởng cho hướng đi tiếp theo của cốt truyện.',
+        chips: ['Cốt truyện tiếp theo có thể đi theo hướng nào? Cho tôi vài gợi ý.', 'Dựa trên cục diện hiện tại, hãy đề xuất một bước ngoặt đáng giá.'],
     },
     // icon 是 Font Awesome 类名（renderEmptyState 拼成 `fa-solid ${icon}`），与上面各模式一致——
     // 用与校正按钮同款的 fa-wand-magic-sparkles（不是 emoji，emoji 拼进 class 会渲染空白）。
     fix: {
         icon: 'fa-wand-magic-sparkles',
-        lead: '手动：在下方输入框直接说要改哪里，只改这一条回复（快、单稿）。<br>自动：每条新回复后台自动清 AI 味——「校正设置」切到「去 AI 味」、开「每条新回复自动去 AI 味」。',
-        sub: '校正只去 AI 腔 / 收紧读感——不翻译、不改设定、不算数值、不修卡片本身的问题。',
-        chips: ['这个角色不该知道这件事，重写他的对话', '这个事件的日期不对，回看上下文改正', '这个角色的台词太机械，重写得更像真人', '扩写这一段，补充更多剧情细节'],
+        lead: 'Thủ công: Nói trực tiếp ở khung nhập bên dưới cần sửa chỗ nào, chỉ sửa phản hồi này (nhanh, một bản thảo).<br>Tự động: Tự động khử vị AI dưới nền cho mỗi phản hồi mới — chuyển "Cài đặt hiệu chỉnh" sang "Khử vị AI", bật "Tự động khử vị AI cho mỗi phản hồi mới".',
+        sub: 'Hiệu chỉnh chỉ khử giọng AI / trau chuốt cảm giác đọc — không dịch thuật, không đổi thiết lập, không tính toán chỉ số, không sửa lỗi của chính thẻ nhân vật.',
+        chips: ['Nhân vật này không nên biết điều này, hãy viết lại lời thoại', 'Ngày tháng của sự kiện này bị sai, hãy xem lại ngữ cảnh để sửa', 'Lời thoại nhân vật quá máy móc, hãy viết lại tự nhiên như người thật', 'Mở rộng đoạn này, bổ sung thêm nhiều chi tiết cốt truyện'],
     },
-    builder: { icon: 'fa-masks-theater', lead: '一起打造一个立得住的角色。',
-        sub: '先聊清楚是谁、什么样，再一键锻造成稿；写入前都只是草稿。',
-        chips: ['帮我完善我当前的角色。', '我想造一个全新的 NPC。', '把剧情里出现过的那个角色写成世界书条目。'] },
+    builder: { icon: 'fa-masks-theater', lead: 'Cùng nhau xây dựng một nhân vật có chiều sâu.',
+        sub: 'Trước tiên trao đổi rõ là ai, như thế nào, sau đó đúc thành bản thảo chỉ với 1 click; trước khi ghi vào đều chỉ là bản nháp.',
+        chips: ['Giúp tôi hoàn thiện nhân vật hiện tại của mình.', 'Tôi muốn tạo một NPC hoàn toàn mới.', 'Viết nhân vật từng xuất hiện trong cốt truyện thành mục Sách thế giới.'] },
 };
 
 function currentOracleMode() {
@@ -21294,12 +21294,12 @@ function currentOracleMode() {
 }
 
 function modeReturnNote(mode) {
-    if (mode === 'diagnose') return '已返回诊断模式。';
-    if (mode === 'advisor') return '已返回剧情参谋模式。';
-    if (mode === 'fix') return '已返回校正模式。';
-    if (mode === 'lorebook') return '已返回世界书模式。';
-    if (mode === 'builder') return '已返回角色工坊模式。';
-    return '已返回普通聊天模式。';
+    if (mode === 'diagnose') return 'Đã quay lại chế độ Chẩn đoán.';
+    if (mode === 'advisor') return 'Đã quay lại chế độ Tham mưu cốt truyện.';
+    if (mode === 'fix') return 'Đã quay lại chế độ Hiệu chỉnh.';
+    if (mode === 'lorebook') return 'Đã quay lại chế độ Sách thế giới.';
+    if (mode === 'builder') return 'Đã quay lại chế độ Xưởng nhân vật.';
+    return 'Đã quay lại chế độ Trò chuyện thường.';
 }
 
 function setOracleMode(target) {
@@ -21529,7 +21529,7 @@ function refreshDraftCard() {
         card.style.display = 'flex';
         card.innerHTML = '';
         const bhead = document.createElement('div');
-        bhead.textContent = '📋 已有访谈汇总（草稿还未生成）';
+        bhead.textContent = '📋 Tóm tắt phỏng vấn hiện có (chưa tạo bản thảo)';
         const bbody = document.createElement('div');
         bbody.className = 'so-bld-card-body';
         const bdesc = String(st.brief.desc || '');
@@ -21537,7 +21537,7 @@ function refreshDraftCard() {
         const bbtns = document.createElement('div');
         bbtns.className = 'so-bld-card-btns';
         const gen = document.createElement('button');
-        gen.type = 'button'; gen.className = 'so-apply-btn'; gen.textContent = '🔨 生成';
+        gen.type = 'button'; gen.className = 'so-apply-btn'; gen.textContent = '🔨 Tạo';
         gen.addEventListener('click', () => runForge());
         bbtns.appendChild(gen);
         card.append(bhead, bbody, bbtns);
@@ -21582,7 +21582,7 @@ function refreshDraftCard() {
     }
     mk('写入', (e) => applyBuilderDraft(e.currentTarget));      // Task 8
     mk('放弃草稿', async () => {
-        if (!(await uiConfirm('确定放弃当前草稿吗？'))) return;
+        if (!(await uiConfirm('Bạn có chắc chắn muốn hủy bản thảo hiện tại không?'))) return;
         const cur = getBuilderState();
         setBuilderState(cur && cur.brief ? { brief: cur.brief, draft: null, forgedAt: null } : null);
         refreshDraftCard();
@@ -21826,7 +21826,7 @@ async function runCondense(opts = {}) {
     const rawC = draft.content;
     if (!opts.auto && !condenseStyleFlagged(rawC)) {
         // 风格门没点火 = 原稿本就精炼（DS/GM 常态）。手动仍可执行，但先确认（条款来自 gm-v01 电池教训：模型会凑量误删）。
-        if (!(await uiConfirm('这张卡本就精炼，精简收益不大——仍要执行？'))) return;
+        if (!(await uiConfirm('Thẻ này vốn đã ngắn gọn, việc tinh giản không đem lại nhiều hiệu quả — bạn vẫn muốn thực hiện?'))) return;
     }
     // 自动路径先自报家门（1.17.4 后台调用要可见可中断的老规矩）：不然锻造刚完又冒出第二个流式
     // 气泡，像「又在重新生成」。手动路径不用——按钮是用户自己点的。
@@ -21913,7 +21913,7 @@ async function runCondenseDepth() {
     if (!draft || !String(draft.target || '').startsWith('npc')) return;
     const rawC = draft.content;
     if (!condenseStyleFlagged(rawC)) {
-        if (!(await uiConfirm('这张卡本就精炼，深度精简收益不大——仍要执行？'))) return;
+        if (!(await uiConfirm('Thẻ này vốn đã ngắn gọn, việc tinh giản sâu không đem lại nhiều hiệu quả — bạn vẫn muốn thực hiện?'))) return;
     }
     const groups = condenseSplitSections(rawC);
     if (groups.length !== 3 || groups.some((g) => !g.text)) { modeEntryNote('✂️✂️ 深度精简未采纳：章节太少，直接用「✂️ 精简全稿」即可。'); return; }
@@ -22050,7 +22050,7 @@ async function applyBuilderDraft(btn) {
         try {
             await btn._undo();
             btn._undo = null;
-            btn.textContent = '写入';
+            btn.textContent = 'Ghi vào';
             modeEntryNote('已撤销写入。');
         } catch (e) { modeEntryNote('撤销失败：' + (e?.message || e)); } finally { btn.disabled = false; }
         return;
@@ -22063,7 +22063,7 @@ async function applyBuilderDraft(btn) {
             modeEntryNote('已写入当前 Persona 的描述。');
         } else if (d.target === 'persona-new') {
             if (personaNameExists(d.name)) {
-                if (!(await uiConfirm(`已存在同名 Persona「${d.name}」。仍要再建一个吗？`))) return;
+                if (!(await uiConfirm(`Đã tồn tại Persona cùng tên「${d.name}」. Bạn vẫn muốn tạo thêm một cái nữa?`))) return;
             }
             const avatarId = await createPersonaWithAvatar(d.name, d.content);
             btn._undo = async () => { await deletePersonaById(avatarId); };
@@ -22111,7 +22111,7 @@ async function applyBuilderDraft(btn) {
             btn._undo = async () => { await undoLorebookOps(res.snapshots); };
             modeEntryNote(`已写入Lorebook「${book}」（${op.action === 'create' ? 'Tạo mới条目' : `Cập nhật uid=${op.uid}`}）。`);
         }
-        btn.textContent = '撤销';
+        btn.textContent = 'Hoàn tác';
     } catch (e) {
         modeEntryNote('写入失败：' + (e?.message || e));
     } finally {
@@ -22157,7 +22157,7 @@ function addBridgeChip() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'so-bridge-chip';
-    btn.innerHTML = '<i class="fa-solid fa-compass"></i> 导入普通聊天的讨论并整理成方案';
+    btn.innerHTML = '<i class="fa-solid fa-compass"></i> Nhập thảo luận từ chat thường và lập thành phương án';
     btn.addEventListener('click', () => {
         if (isGenerating) return;
         wrap.remove();
@@ -22198,7 +22198,7 @@ function renderPlanBar() {
     const pre = planBarEl.querySelector('#so-plan-directive');
     if (!active) {
         pre.classList.remove('open');
-        planBarEl.querySelector('#so-plan-show').textContent = '▸ 查看注入内容';
+        planBarEl.querySelector('#so-plan-show').textContent = '▸ Xem nội dung dẫn dắt';
         planBarSetDisplay('#so-plan-editwrap', false);
         // 序列专属两件也要收（1.72.0）：条整体虽被 so-plan-on 隐藏，但它会被搬进浮窗、
         // 而下一个构件未必是序列 —— 残件留在 DOM 里迟早以「上一条序列的拍列表」形式冒出来。
@@ -22327,8 +22327,8 @@ function renderSeqBarBody(seq) {
     }
     if (pill && !hintOk) { pill.remove(); pill = null; }
     if (pill) {
-        pill.textContent = '这一拍可能已落地——完成？';   // 文案 Prince 亲选 2026-08-28
-        pill.title = `证据：「${seq.pulseHint.quote}」`;
+        pill.textContent = 'Nhịp này có thể đã hoàn thành — Xong?';   // 文案 Prince 亲选 2026-08-28
+        pill.title = `Bằng chứng:「${seq.pulseHint.quote}」`;
     }
     planBarEl.querySelector('#so-plan-done').classList.toggle('so-pulse-glow', !!hintOk);
     planBarEl.querySelector('#so-arc-diff-badge').style.display = 'none';
@@ -22368,14 +22368,14 @@ function renderSeqList(seq) {
             const edit = document.createElement('button');
             edit.type = 'button';
             edit.className = 'so-seq-row-btn';
-            edit.title = '编辑这一拍的注入内容';
+            edit.title = 'Chỉnh sửa nội dung dẫn dắt của nhịp này';
             edit.innerHTML = '<i class="fa-solid fa-pencil"></i>';
             edit.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); enterSeqBeatEdit(b.id); });
             const skip = document.createElement('button');
             skip.type = 'button';
             skip.className = 'so-seq-row-btn';
-            skip.title = '跳过这一拍（不会播它）';
-            skip.textContent = '跳过';
+            skip.title = 'Bỏ qua nhịp này (sẽ không phát)';
+            skip.textContent = 'Bỏ qua';
             skip.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); seqSkipBeatUi(b.id); });
             sum.appendChild(edit);
             sum.appendChild(skip);
@@ -22426,7 +22426,7 @@ function renderArcBarBody(arc) {
     const badge = planBarEl.querySelector('#so-arc-diff-badge');
     const seg = planBarEl.querySelector('#so-plan-intensity');
     const pre = planBarEl.querySelector('#so-plan-directive');
-    planBarEl.querySelector('#so-plan-label').textContent = blind ? '盲盒引导' : '弧线引导';
+    planBarEl.querySelector('#so-plan-label').textContent = blind ? 'Dẫn dắt hộp mù' : 'Dẫn dắt hồi truyện';
     planBarEl.querySelector('#so-plan-progress').textContent =
         `路标 ${idx}/${total}` + (!blind && wp ? `　·　${wp.intent}` : '')
         + (arc.throughline ? `　·　贯穿线：${arc.throughline}` : '');
@@ -22448,7 +22448,7 @@ function renderArcBarBody(arc) {
             (stageB ? '盲盒 · 延伸任务（上一步还差一口气） · ' : '盲盒 · ') + D.caption;
         pre.classList.add('so-spoiler');
         pre.classList.remove('peek');            // re-mask on every state change (new secret)
-        pre.title = '点击查看隐藏指令（含剧透）';
+        pre.title = 'Bấm để xem chỉ thị ẩn (có thể lộ nội dung)';
     } else {
         planBarEl.querySelector('#so-plan-goal').textContent = beat ? beat.goal : '';
         badge.style.display = 'none';
@@ -22524,7 +22524,7 @@ function enterPlanEdit() {
     if (wrap.style.display !== 'none') return;
     const pre = planBarEl.querySelector('#so-plan-directive');
     pre.classList.add('open');                                   // 退出编辑后预览保持展开
-    planBarEl.querySelector('#so-plan-show').textContent = '▾ 收起注入内容';
+    planBarEl.querySelector('#so-plan-show').textContent = '▾ Thu gọn nội dung dẫn dắt';
     pre.style.display = 'none';
     wrap.style.display = '';
     const box = planBarEl.querySelector('#so-plan-editbox');
@@ -22664,7 +22664,7 @@ function activeConstructLabel() {
 
 // 退出整条弧线需一次确认（与游玩按钮空间分离的硬操作）。
 async function confirmArcExit() {
-    if (await uiConfirm('确定退出？当前弧线和引导将被完全清除，主聊天恢复原状。')) arcExit();
+    if (await uiConfirm('Bạn có chắc chắn muốn thoát? Hồi truyện và dẫn dắt hiện tại sẽ bị xóa hoàn toàn, đoạn chat chính trở lại bình thường.')) arcExit();
 }
 
 // 读手动弧线表单 → 采用一条弧线（透明 或 盲盒；layer-2 / 4b「手动放置拍子」入口）。
@@ -22679,9 +22679,9 @@ function resetArcForm() {
     win.querySelector('#so-arc-direction').value = '';
     win.querySelector('#so-arc-mode').value = 'transparent';
     win.querySelector('#so-arc-blind-fields').style.display = 'none';
-    win.querySelector('#so-arc-create').textContent = '创建透明弧';
+    win.querySelector('#so-arc-create').textContent = 'Tạo Hồi truyện minh bạch';
     const wpL = win.querySelector('#so-arc-waypoints-label');
-    if (wpL) wpL.textContent = '路标（每行一个，意图级——透明弧你看得到每一拍，需自己填写）';
+    if (wpL) wpL.textContent = 'Mốc dẫn đường (mỗi dòng một mốc, cấp độ ý đồ — Hồi truyện minh bạch bạn sẽ thấy từng nhịp, cần tự điền)';
 }
 
 async function onArcCreate() {
@@ -22714,7 +22714,7 @@ async function onArcCreate() {
     // 三方互斥（1.72.0）：采用弧线会静默丢弃在场的序列——先问一次。排在全部校验【之后】，
     // 免得用户为一次注定失败的提交（路标空）先答一遍确认。
     if (ENABLE_PLAN_SEQ && seqHasUnplayed(getSeq())
-        && !(await uiConfirm('当前有一条尚未播完的引导序列，采用弧线将丢弃它。继续？'))) return;
+        && !(await uiConfirm('Hiện có một chuỗi dẫn dắt chưa hoàn tất, áp dụng Hồi truyện sẽ hủy chuỗi này. Tiếp tục?'))) return;
     resetArcForm();
     if (waypoints.length) adoptArc(spec);
     else adoptArcWithDraftedWaypoints(spec);   // 盲盒留空：异步起草整条骨架后采用
@@ -22835,7 +22835,7 @@ function applyPlanFloatCollapsed() {
     // 防剧透：① 绝不在可 hover 的 head 上挂任何内容（此前折叠态把当前拍 goal 直接 hover 出来 = 破坏盲盒保密）；
     // ② 只在 compass 按钮上给【玩家可见】标签（activeConstructLabel 盲盒只回 objective、绝不回 goal）。
     const label = activeConstructLabel();
-    btn.title = collapsed ? (label ? `Mở rộng · ${label}` : '展开剧情引导') : '收起成指南针（不挡屏）';
+    btn.title = collapsed ? (label ? `Mở rộng · ${label}` : 'Mở rộng dẫn dắt cốt truyện') : 'Thu gọn thành la bàn (không chắn màn hình)';
     planFloat.querySelector('#so-plan-float-head').title = '';
     // 落拍闪烁（1.74.1）：折叠成罗盘 + hint 现役 → 整颗药丸缓慢呼吸到全亮（展开态由条上的
     // ✔ 完成钮闪，两处判据同一口 seqPulseHintOn）。classList.toggle 同值不动类 → 动画不重启。
@@ -22882,7 +22882,7 @@ function renderBuilderChips() {
         if (sec.adv && !advTagShown) {
             const tag = document.createElement('span');
             tag.className = 'so-bld-chips-advtag';
-            tag.textContent = '简单 / 喜剧调剂角色留空 ▸';
+            tag.textContent = 'Nhân vật đơn giản / hài hước để trống ▸';
             wrap.appendChild(tag);
             advTagShown = true;
         }
@@ -22965,7 +22965,7 @@ async function populateBuilderBooks(announce) {
     const activeSet = new Set(active);
     listEl.innerHTML = '';
     if (!all.length) {
-        listEl.innerHTML = '<div class="so-lb-ent-empty">（没有找到任何世界书。）</div>';
+        listEl.innerHTML = '<div class="so-lb-ent-empty">(Không tìm thấy Lorebook nào.)</div>';
     } else {
         for (const name of all) {
             const row = document.createElement('label');
@@ -22991,7 +22991,7 @@ function updateBldBookSummary() {
     const sum = win.querySelector('#so-bld-bookpick-sum');
     if (!sum) return;
     const t = getSettings().bldBooks;
-    sum.textContent = (Array.isArray(t) && t.length) ? `Lorebook：已选 ${t.length} 本` : '世界书：当前激活的';
+    sum.textContent = (Array.isArray(t) && t.length) ? `Lorebook: Đã chọn ${t.length} cuốn` : 'Sách thế giới: Đang kích hoạt';
 }
 
 // 从勾选的行重算 bldBooks；刷新依赖 UI（同 onLbBookSelectionChange）。
@@ -23319,7 +23319,7 @@ async function populateLorebookBooks(announce) {
     const activeSet = new Set(active);
     listEl.innerHTML = '';
     if (!all.length) {
-        listEl.innerHTML = '<div class="so-lb-ent-empty">（没有找到任何世界书。）</div>';
+        listEl.innerHTML = '<div class="so-lb-ent-empty">(Không tìm thấy Lorebook nào.)</div>';
     } else {
         for (const name of all) {
             const row = document.createElement('label');
@@ -24496,7 +24496,7 @@ async function populateWiCustomBooks(announce) {
     const activeSet = new Set(active);
     listEl.innerHTML = '';
     if (!all.length) {
-        listEl.innerHTML = '<div class="so-lb-ent-empty">（没有找到任何世界书。）</div>';
+        listEl.innerHTML = '<div class="so-lb-ent-empty">(Không tìm thấy Lorebook nào.)</div>';
     } else {
         for (const name of all) {
             const row = document.createElement('label');
@@ -29168,7 +29168,7 @@ function renderFixSelectResult(assistantEl, contentEl, sel, finalText) {
     diff.style.display = 'none';
     const bar = document.createElement('div'); bar.className = 'so-apply-bar';
     const applyBtn = document.createElement('button'); applyBtn.className = 'so-apply-btn'; applyBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 应用（回插这段）';
-    const diffBtn = document.createElement('button'); diffBtn.className = 'so-apply-btn'; diffBtn.innerHTML = '<i class="fa-solid fa-eye"></i> 看改动';
+    const diffBtn = document.createElement('button'); diffBtn.className = 'so-apply-btn'; diffBtn.innerHTML = '<i class="fa-solid fa-eye"></i> Xem thay đổi';
     const status = document.createElement('span'); status.className = 'so-apply-status';
     diffBtn.addEventListener('click', () => { diff.style.display = (diff.style.display === 'none') ? 'block' : 'none'; });
     applyBtn.addEventListener('click', async () => {
@@ -30825,7 +30825,7 @@ async function onFetchModels() {
     if (!s.endpoint) { hint.textContent = '请先填写端点 URL。'; hint.classList.add('so-hint-error'); return; }
 
     hint.classList.remove('so-hint-error');
-    hint.textContent = '正在加载模型…';
+    hint.textContent = 'Đang tải danh sách mô hình…';
     btn.classList.add('so-busy');
 
     try {
@@ -30852,12 +30852,12 @@ async function onFetchModels() {
             list.map((m) => (typeof m === 'string' ? m : (m?.id || m?.name))).filter(Boolean)
         )].sort((a, b) => a.localeCompare(b));
 
-        if (!ids.length) { hint.textContent = '服务商未返回任何模型。'; sel.style.display = 'none'; return; }
+        if (!ids.length) { hint.textContent = 'Nhà cung cấp không trả về bất kỳ mô hình nào.'; sel.style.display = 'none'; return; }
 
         sel.innerHTML = '';
         const ph = document.createElement('option');
         ph.value = '';
-        ph.textContent = `— 选择一个模型（共 ${ids.length} 个）—`;
+        ph.textContent = `— Chọn một mô hình (Tổng cộng ${ids.length} mô hình) —`;
         sel.appendChild(ph);
         for (const id of ids) {
             const opt = document.createElement('option');
@@ -30868,10 +30868,10 @@ async function onFetchModels() {
         // pre-select the current model if it's in the list
         if (s.model && ids.includes(s.model)) sel.value = s.model;
         sel.style.display = '';
-        hint.textContent = `共 ${ids.length} 个模型 —— 选择其一，或继续输入自定义名称。`;
+        hint.textContent = `Tổng cộng ${ids.length} mô hình —— Hãy chọn một mô hình, hoặc tiếp tục nhập tên tùy chỉnh.`;
     } catch (err) {
         const aborted = err?.name === 'TimeoutError' || err?.name === 'AbortError';
-        hint.textContent = aborted ? '请求超时。' : `获取模型失败：${err?.message || err}`;
+        hint.textContent = aborted ? 'Yêu cầu quá thời gian.' : `Lấy danh sách mô hình thất bại: ${err?.message || err}`;
         hint.classList.add('so-hint-error');
         sel.style.display = 'none';
         console.error('[Story Oracle] model fetch failed:', err);
@@ -31338,9 +31338,9 @@ function addMessage(role, content, entry) {
     let actionBtns = '';
     if (entry) {
         if (role === 'user') {
-            actionBtns += `<button class="so-msg-btn so-edit-btn" type="button" title="编辑并重新生成"><i class="fa-solid fa-pen"></i></button>`;
+            actionBtns += `<button class="so-msg-btn so-edit-btn" type="button" title="Chỉnh sửa và tạo lại"><i class="fa-solid fa-pen"></i></button>`;
         } else {
-            actionBtns += `<button class="so-msg-btn so-regen-btn" type="button" title="重新生成（会丢弃其后的内容）"><i class="fa-solid fa-rotate"></i></button>`;
+            actionBtns += `<button class="so-msg-btn so-regen-btn" type="button" title="Tạo lại (sẽ bỏ các nội dung phía sau)"><i class="fa-solid fa-rotate"></i></button>`;
         }
         actionBtns += `<button class="so-msg-btn so-del-btn" type="button" title="Xóa"><i class="fa-solid fa-trash"></i></button>`;
     }
@@ -31348,8 +31348,8 @@ function addMessage(role, content, entry) {
     // 消息，所以哪条 AI 气泡上点都一样；只挂在 AI 气泡上（与复制同一惯例，用户气泡那行留给编辑/删除）。
     // 可见性【不】在这里判定就完事 —— 见 soApplyConvoIoVisual 的说明（换房重画覆盖不到所有模式过渡）。
     const convIoBtns = role === 'assistant'
-        ? `<button class="so-msg-btn so-convio-btn so-msg-export-btn" type="button" title="导出本页对话" aria-label="导出本页对话"><i class="fa-solid fa-file-export"></i></button>`
-          + `<button class="so-msg-btn so-convio-btn so-msg-import-btn" type="button" title="导入对话文件" aria-label="导入对话文件"><i class="fa-solid fa-file-import"></i></button>`
+        ? `<button class="so-msg-btn so-convio-btn so-msg-export-btn" type="button" title="Xuất hội thoại trang này" aria-label="Xuất hội thoại trang này"><i class="fa-solid fa-file-export"></i></button>`
+          + `<button class="so-msg-btn so-convio-btn so-msg-import-btn" type="button" title="Nhập tệp hội thoại" aria-label="Nhập tệp hội thoại"><i class="fa-solid fa-file-import"></i></button>`
         : '';
 
     wrap.innerHTML =
@@ -31369,11 +31369,11 @@ function addMessage(role, content, entry) {
             const ok = await copyTextRobust(contentEl.textContent);
             cBtn.classList.add('so-copied');
             cBtn.innerHTML = ok ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
-            cBtn.title = ok ? '已复制' : '复制失败 —— 请手动选择文本';
+            cBtn.title = ok ? 'Đã sao chép' : 'Sao chép thất bại —— Vui lòng chọn văn bản thủ công';
             setTimeout(() => {
                 cBtn.classList.remove('so-copied');
                 cBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
-                cBtn.title = '复制';
+                cBtn.title = 'Sao chép';
             }, 1200);
         });
     }
@@ -31472,7 +31472,7 @@ function editUserMessage(entry) {
     const actions = document.createElement('div');
     actions.className = 'so-edit-actions';
     const saveBtn = document.createElement('button');
-    saveBtn.className = 'so-edit-save'; saveBtn.textContent = '保存并重新生成';
+    saveBtn.className = 'so-edit-save'; saveBtn.textContent = 'Lưu và tạo lại';
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'so-edit-cancel'; cancelBtn.textContent = 'Hủy';
     actions.appendChild(saveBtn); actions.appendChild(cancelBtn);
@@ -31514,7 +31514,7 @@ function addRetryControl(assistantEl, entry) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'so-apply-btn so-retry-btn';
-    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> 重试';
+    btn.innerHTML = '<i class="fa-solid fa-rotate-right"></i> Thử lại';
     bar.appendChild(btn);
     bubble.appendChild(bar);
     scrollToBottom();
@@ -31533,14 +31533,14 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
     bar.className = 'so-apply-bar';
     const btn = document.createElement('button');
     btn.className = 'so-apply-btn';
-    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 将修复应用到状态';
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Áp dụng sửa chữa vào trạng thái';
     const status = document.createElement('span');
     status.className = 'so-apply-status';
     // 已应用状态（1.33.2）：会话内应用过（注册表有快照）→ 撤销态重生；只剩持久标记（重载过，
     // 快照已失）→ 不出应用按钮、只留说明——旧补丁对已前进的状态重放不安全（delta 会二次叠加）。
     const sess = entry ? ((peekNoteOpts(convoStreamKey, entry) || {}).diagApplied || null) : null;
     if (!sess && entry && isRecordApplied(convoStreamKey, entry)) {
-        status.textContent = '此前已应用过此补丁，应用按钮已收起（重载后撤销不可用）。需要再修请重新诊断。';
+        status.textContent = 'Bản vá này đã được áp dụng trước đó, nút áp dụng đã thu lại (không thể hoàn tác sau khi tải lại trang). Nếu cần sửa thêm vui lòng chẩn đoán lại.';
         bar.appendChild(status);
         assistantEl.querySelector('.so-bubble').appendChild(bar);
         scrollToBottom();
@@ -31560,8 +31560,8 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
         snapshot = sess.snapshot;
         applied = sess.applied || null;
         wb = sess.wb || null;   // 老形状的负载没有这一格 → null，撤销退化成「只回滚变量」（= 接上之前的行为）
-        btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 撤销';
-        status.textContent = '已应用 —— 状态已更新。';
+        btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Hoàn tác';
+        status.textContent = 'Đã áp dụng —— Trạng thái đã được cập nhật.';
     }
     btn.addEventListener('click', async () => {
         status.classList.remove('so-hint-error');
@@ -31577,9 +31577,9 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
             catch (e) { live = null; }
             if (diagUndoDrifted(live, applied)) {
                 const okGo = await uiConfirm('Trạng thái đã thay đổi sau đó, hoàn tác sẽ đưa các thay đổi sau trở lại. Xác nhận?');
-                if (!okGo) { status.textContent = '已取消。'; btn.disabled = false; return; }
+                if (!okGo) { status.textContent = 'Đã hủy.'; btn.disabled = false; return; }
             }
-            status.textContent = '正在还原…';
+            status.textContent = 'Đang khôi phục…';
             try {
                 await undoFix(snapshot);
                 await removeDiagWriteBack(wb);   // 连正文里那段一起摘掉，否则「重新处理变量」会把它算回来
@@ -31587,12 +31587,12 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
                 applied = null;
                 // wb【有意保留】：与 addNoteUndoControls 同款对称——重新应用时把同一段放回去。
                 if (entry) { dropNoteOpts(convoStreamKey, entry); unmarkRecordApplied(convoStreamKey, entry); }
-                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 将修复应用到状态';
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Áp dụng sửa chữa vào trạng thái';
                 // Task 7：还原也是一次 MVU 写入，落点同样是最末非系统楼——落在用户楼上时同样看不见。
                 const n = diagUserFloorNotice();
-                status.textContent = '已还原到之前的状态。' + (n ? '\n' + n : '');
+                status.textContent = 'Đã khôi phục về trạng thái trước đó.' + (n ? '\n' + n : '');
             } catch (e) {
-                status.textContent = '还原失败：' + (e?.message || e);
+                status.textContent = 'Khôi phục thất bại: ' + (e?.message || e);
                 status.classList.add('so-hint-error');
             }
             btn.disabled = false;
@@ -31611,7 +31611,7 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
             const liveKey = diagStatKey(liveStat);
             if (diagStampDrifted(st, liveKey, fixChatKey())) {
                 const okGo = await uiConfirm('Trạng thái đã thay đổi sau đó, áp dụng có thể ghi đè các thay đổi sau. Xác nhận?');
-                if (!okGo) { status.textContent = '已取消。'; btn.disabled = false; return; }
+                if (!okGo) { status.textContent = 'Đã hủy.'; btn.disabled = false; return; }
                 // 用户明确压过了这道闸 → 【不】再把指纹交给 applyFix：那会在里面二次拦截，表现成
                 // 「点了确定还是不写」。他知道自己在做什么，这是他的决定。
             } else {
@@ -31620,7 +31620,7 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
                 expectStatKey = st.statKey;
             }
         }
-        status.textContent = '正在应用…';
+        status.textContent = 'Đang áp dụng…';
         try {
             // applyFix 回 { snapshot, applied, report }（null = 一个字都没写，原因已由 applyFix 写在
             // status 上）。判据是 r 而不是 r.snapshot：读不到写入【前】的状态时 snapshot 会是 null，但
@@ -31673,7 +31673,7 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
                     if (snapshot) registerNoteOpts(convoStreamKey, entry, Object.assign({}, peekNoteOpts(convoStreamKey, entry) || {}, { diagApplied: { snapshot, applied, wb } }));
                     markRecordApplied(convoStreamKey, entry);
                 }
-                if (snapshot) btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 撤销';
+                if (snapshot) btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Hoàn tác';
                 else dead = true;
                 // Task 7（审计簇 D）：落点是用户自己那一楼时，值写对了、状态栏却要等下一条 AI 回复才
                 // 显示得出来——不说这句，用户只会认为这次修复没生效。现算（见 diagUserFloorNotice 头注）。
@@ -31683,7 +31683,7 @@ function addApplyControls(assistantEl, patchBlock, entry, replyText) {
                     : '已应用 —— 状态已更新。') + repairDiagNote(r.repair) + (n ? '\n' + n : '');
             }
         } catch (e) {
-            status.textContent = '应用失败：' + (e?.message || e);
+            status.textContent = 'Áp dụng thất bại: ' + (e?.message || e);
             status.classList.add('so-hint-error');
         }
         btn.disabled = dead;
@@ -31708,11 +31708,11 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
     bar.className = 'so-apply-bar';
     const btn = document.createElement('button');
     btn.className = 'so-apply-btn';
-    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 应用到回复';
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Áp dụng vào phản hồi';
     // 「看改动」：原文（去机制块，prose↔prose）→ 校正稿的内联差异卡，懒构建一次后切 hidden 复用。
     const diffBtn = document.createElement('button');
     diffBtn.className = 'so-apply-btn';
-    diffBtn.innerHTML = '<i class="fa-solid fa-eye"></i> 看改动';
+    diffBtn.innerHTML = '<i class="fa-solid fa-eye"></i> Xem thay đổi';
     const status = document.createElement('span');
     status.className = 'so-apply-status';
     bar.appendChild(btn);
@@ -31725,8 +31725,8 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
         discardBtn = document.createElement('button');
         discardBtn.className = 'so-apply-btn so-fwd-discard';
         // 文案待 Prince 过目
-        discardBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> 放弃';
-        discardBtn.title = '作废这份校正稿。主聊天里的回复一个字都不会动。';
+        discardBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Hủy bỏ';
+        discardBtn.title = 'Hủy bản thảo hiệu chỉnh này. Phản hồi trong cuộc trò chuyện chính sẽ không bị thay đổi.';
         bar.appendChild(discardBtn);
     }
     bar.appendChild(status);
@@ -31771,8 +31771,8 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
         // swipe），「看改动」照常可用（材料都在）。
         applied = true;
         btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> 已应用（左滑看原文）';
-        status.textContent = '已作为新 swipe 写入这条回复。';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã áp dụng (Vuốt trái xem bản gốc)';
+        status.textContent = 'Đã ghi vào phản hồi này dưới dạng Swipe mới.';
         if (discardBtn) discardBtn.remove();   // 已应用就没有「放弃」这一说（撤销 = 左滑回原文）
     }
     if (discardBtn) {
@@ -31783,14 +31783,14 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
             btn.disabled = true;
             discardBtn.remove();
             // 文案待 Prince 过目
-            status.textContent = '已放弃这份校正稿——主聊天里的回复一个字都没动。';
+            status.textContent = 'Đã hủy bản thảo hiệu chỉnh này —— Phản hồi trong cuộc trò chuyện chính không thay đổi.';
         });
     }
     btn.addEventListener('click', async () => {
         if (applied) return;
         status.classList.remove('so-hint-error');
         btn.disabled = true;
-        status.textContent = '正在应用…';
+        status.textContent = 'Đang áp dụng…';
         try {
             // P-CORRUPT（主要面 = 延迟点击「应用」）：写入前再核对捕获快照。这段时间里可能切了聊天、划了 swipe、
             // 或编辑了这条回复——失效则不写、给人话原因、把按钮放回去让用户重新校正（绝不写到别的对话 / 覆盖新内容）。
@@ -31804,7 +31804,7 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
             // P-TRUNC 廉价复检：成品（parsed.fixed）像是半句且明显短于原文 → 不写入（半句稿会腰斩回复）。
             // 分段校正（finalOverride）已逐段查过截断，整稿复检跳过（拼接稿的「断句 + 偏短」启发式不适用）。
             if (finalOverride == null && fixOutputTruncated(parsed.fixed, undefined, captured && captured.prose).truncated) {
-                status.textContent = '校正稿似乎被截断了，未应用。请点 ↻ 重试或调大「最大 token 数」后重新校正。';
+                status.textContent = 'Bản thảo hiệu chỉnh dường như đã bị cắt ngắn, chưa được áp dụng. Vui lòng bấm ↻ Thử lại hoặc tăng "Số token tối đa" rồi thử lại.';
                 status.classList.add('so-hint-error');
                 btn.disabled = false;
                 return;
@@ -31821,8 +31821,8 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
                     const cur = peekNoteOpts(convoStreamKey, opts.entry);
                     if (cur && cur.fixApply) cur.fixApply.applied = true;
                 }
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> 已应用（左滑看原文）';
-                status.textContent = '已作为新 swipe 写入这条回复。';
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> Đã áp dụng (Vuốt trái xem bản gốc)';
+                status.textContent = 'Đã ghi vào phản hồi này dưới dạng Swipe mới.';
                 if (discardBtn) discardBtn.remove();   // 写进去了就没有「放弃」这一说（撤销 = 左滑回原文）
             } else {
                 status.textContent = '应用失败：没找到目标消息或保存失败。';
@@ -31830,7 +31830,7 @@ function addFixApplyControls(assistantEl, parsed, originalReply, targetIdx, keep
                 btn.disabled = false;
             }
         } catch (e) {
-            status.textContent = '应用失败：' + (e?.message || e);
+            status.textContent = 'Áp dụng thất bại: ' + (e?.message || e);
             status.classList.add('so-hint-error');
             btn.disabled = false;
         }
@@ -31849,14 +31849,14 @@ function addLorebookApplyControls(assistantEl, parsed, entry) {
     bar.className = 'so-apply-bar';
     const btn = document.createElement('button');
     btn.className = 'so-apply-btn';
-    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 将改动应用到世界书';
+    btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Áp dụng thay đổi vào Sách thế giới';
     const status = document.createElement('span');
     status.className = 'so-apply-status';
     // 已应用状态（1.33.2）：会话内应用过（注册表有快照+结果）→ 撤销态重生；只剩持久标记（重载过，
     // 快照已失）→ 不出应用按钮、只留说明——重放旧书快照会回滚整本书；再点应用则 create 类操作会出重复条目。
     const sess = entry ? ((peekNoteOpts(convoStreamKey, entry) || {}).lbApplied || null) : null;
     if (!sess && entry && isRecordApplied(convoStreamKey, entry)) {
-        status.textContent = '此前已应用过这批改动，应用按钮已收起（重载后撤销不可用）。需要再次应用或调整，请让我重新出一版改动。';
+        status.textContent = 'Đợt sửa đổi này đã được áp dụng trước đó, nút áp dụng đã thu lại (không thể hoàn tác sau khi tải lại). Nếu cần sửa thêm, vui lòng yêu cầu tôi tạo lại một bản sửa đổi mới.';
         bar.appendChild(status);
         bubble.appendChild(bar);
         scrollToBottom();
@@ -31915,7 +31915,7 @@ function addLorebookApplyControls(assistantEl, parsed, entry) {
         // 换房重画重生：快照、逐条结果、汇总都从注册表取回，按钮直接是「撤销」——1.28.0 前的手感。
         snapshots = sess.snapshots;
         renderResults(sess.results);
-        btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 撤销';
+        btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Hoàn tác';
         status.textContent = `已Áp dụng：${sess.summary}。Lorebook已Lưu。`;
     }
     btn.addEventListener('click', async () => {
@@ -31923,23 +31923,23 @@ function addLorebookApplyControls(assistantEl, parsed, entry) {
         if (snapshots) {
             // currently applied -> undo
             btn.disabled = true;
-            status.textContent = '正在还原…';
+            status.textContent = 'Đang khôi phục…';
             try {
                 await undoLorebookOps(snapshots);
                 snapshots = null;
                 if (entry) { dropNoteOpts(convoStreamKey, entry); unmarkRecordApplied(convoStreamKey, entry); }
                 resultsEl.innerHTML = '';
-                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> 将改动应用到世界书';
+                btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Áp dụng thay đổi vào Sách thế giới';
                 status.textContent = `已Khôi phục。待Áp dụng：${lbSummaryOf(ops)}`;
             } catch (e) {
-                status.textContent = '还原失败：' + (e?.message || e);
+                status.textContent = 'Khôi phục thất bại: ' + (e?.message || e);
                 status.classList.add('so-hint-error');
             }
             btn.disabled = false;
             return;
         }
         btn.disabled = true;
-        status.textContent = '正在应用…';
+        status.textContent = 'Đang áp dụng…';
         previewEl.innerHTML = '';   // 预检让位给真结果（点应用即以实际书为准）
         try {
             const res = await applyLorebookOps(ops);
@@ -31952,15 +31952,15 @@ function addLorebookApplyControls(assistantEl, parsed, entry) {
                     registerNoteOpts(convoStreamKey, entry, { lbApplied: { snapshots: res.snapshots, results: res.results, summary: res.summary } });
                     markRecordApplied(convoStreamKey, entry);
                 }
-                btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> 撤销';
+                btn.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Hoàn tác';
                 status.textContent = `已Áp dụng：${res.summary}。Lorebook已Lưu。`;
             } else {
                 snapshots = null;
-                status.textContent = '没有任何改动被应用（全部跳过，见下方原因）。';
+                status.textContent = 'Không có thay đổi nào được áp dụng (tất cả đều bị bỏ qua, xem nguyên nhân bên dưới).';
                 status.classList.add('so-hint-error');
             }
         } catch (e) {
-            status.textContent = '应用失败：' + (e?.message || e);
+            status.textContent = 'Áp dụng thất bại: ' + (e?.message || e);
             status.classList.add('so-hint-error');
         }
         btn.disabled = false;
@@ -31978,7 +31978,7 @@ function addLorebookApplyControls(assistantEl, parsed, entry) {
             previewEl.innerHTML = '';
             const head = document.createElement('div');
             head.className = 'so-lb-preview-head';
-            head.textContent = '应用前预检（点「应用」时以当前世界书为准）：';
+            head.textContent = 'Tiền kiểm tra trước khi áp dụng (khi bấm Áp dụng sẽ lấy Sách thế giới hiện tại làm chuẩn):';
             previewEl.appendChild(head);
             for (const v of verdicts) {
                 const row = lbVerdictRow(v);
@@ -32156,8 +32156,8 @@ function addBriefControls(assistantEl, brief) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'so-apply-btn';
-    btn.textContent = '🔨 生成';
-    btn.title = '把这份汇总连同全部上下文交给锻造工序（一次完整调用）';
+    btn.textContent = '🔨 Tạo';
+    btn.title = 'Gửi bản tóm tắt này cùng toàn bộ ngữ cảnh vào quy trình tạo nhân vật (một lần gọi đầy đủ)';
     btn.addEventListener('click', () => runForge());
     bar.appendChild(btn);
     assistantEl.querySelector('.so-bubble').appendChild(bar);
@@ -32185,19 +32185,19 @@ function addPlanControls(assistantEl, plans) {
         if (p.title) {
             const goalEl = document.createElement('div');
             goalEl.className = 'so-plan-card-line';
-            goalEl.textContent = '目标：' + p.goal;
+            goalEl.textContent = 'Mục tiêu: ' + p.goal;
             card.appendChild(goalEl);
         }
         if (p.why) {
             const whyEl = document.createElement('div');
             whyEl.className = 'so-plan-card-line so-plan-card-dim';
-            whyEl.textContent = '契合点：' + p.why;
+            whyEl.textContent = 'Điểm tương thích: ' + p.why;
             card.appendChild(whyEl);
         }
         if (p.seed) {
             const seedEl = document.createElement('div');
             seedEl.className = 'so-plan-card-line so-plan-card-dim';
-            seedEl.textContent = '起始迹象：' + p.seed;
+            seedEl.textContent = 'Dấu hiệu khởi đầu: ' + p.seed;
             card.appendChild(seedEl);
         }
 
@@ -32226,11 +32226,11 @@ function addPlanControls(assistantEl, plans) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'so-apply-btn';
-        btn.innerHTML = '<i class="fa-solid fa-compass"></i> 开始引导';
+        btn.innerHTML = '<i class="fa-solid fa-compass"></i> Bắt đầu dẫn dắt';
         btn.addEventListener('click', async () => {
             // 三方互斥（1.72.0）：采用单拍会静默丢弃在场的序列——序列损失比单拍大，先问一次。
             if (ENABLE_PLAN_SEQ && seqHasUnplayed(getSeq())
-                && !(await uiConfirm('当前有一条尚未播完的引导序列，采用单拍方案将丢弃它。继续？'))) return;
+                && !(await uiConfirm('Hiện có một chuỗi dẫn dắt chưa hoàn tất, áp dụng phương án đơn bước sẽ hủy chuỗi này. Tiếp tục?'))) return;
             adoptPlan(p, intensity);
             // Mark this card as the adopted one; others stay usable (clicking
             // another replaces the plan, with an explicit note — single-goal rule).
@@ -32306,7 +32306,7 @@ function addSeqControls(assistantEl, seqs) {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'so-apply-btn so-seq-adopt';
-        btn.innerHTML = '<i class="fa-solid fa-list-ol"></i> 开始序列引导';
+        btn.innerHTML = '<i class="fa-solid fa-list-ol"></i> Bắt đầu chuỗi dẫn dắt';
         btn.addEventListener('click', () => {
             // 已有序列在场时 adoptSeq 走的是【尾段拼接】（修订语义，历史拍不动）——所以这里
             // 不像单拍/弧线那样先确认：序列被序列替换不会丢掉已播完的部分。
@@ -32422,8 +32422,8 @@ function appendConvoImportEntry(host) {
     const impBtn = document.createElement('button');
     impBtn.type = 'button';
     impBtn.className = 'so-empty-chip so-convio-btn so-empty-import-btn';
-    impBtn.title = '导入对话 —— 把导出的 Markdown 文件读回这一页';
-    impBtn.innerHTML = '<i class="fa-solid fa-file-import"></i> 导入对话';
+    impBtn.title = 'Nhập hội thoại —— Đọc tệp Markdown đã xuất trở lại trang này';
+    impBtn.innerHTML = '<i class="fa-solid fa-file-import"></i> Nhập hội thoại';
     impBtn.addEventListener('click', importConvo);
     ioRow.appendChild(impBtn);
     host.appendChild(ioRow);
@@ -32432,8 +32432,8 @@ function appendConvoImportEntry(host) {
 async function clearConversation() {
     // 清空会连带删除本聊天已保存的侧聊历史（含自动诊断记录），无法撤销——与本扩展其它破坏性
     // 操作（清空概要 / 重置提示词 / 退出弧线）保持一致，先确认再执行。空对话则无需打扰直接返回。
-    const where = convoStreamKey === 'main' ? '本聊天（普通聊天）的侧聊记录' : (streamCueLabel(convoStreamKey, getSettings()) || '本模式的侧聊记录');
-    if (convo.length && !(await uiConfirm(`Xác nhậnXóa sạch${where}吗？此操作会Xóa已Lưu的记录，无法撤销。`))) return;
+    const where = convoStreamKey === 'main' ? 'nhật ký trò chuyện phụ của chat này (Trò chuyện thường)' : (streamCueLabel(convoStreamKey, getSettings()) || 'nhật ký trò chuyện phụ của chế độ này');
+    if (convo.length && !(await uiConfirm(`Xác nhận xóa sạch ${where} không? Thao tác này sẽ xóa các bản ghi đã lưu và không thể hoàn tác.`))) return;
     // 保活：若正有后台锻造 / 深度精简流进【本房间】，清空即中断它并清两槽（用户主动清本房记录）；保活
     // 运行在别的房间则不动（下面 loadConvoForChat 的守卫也据此放它继续）。
     const liveRun = liveForge || liveCondense;
